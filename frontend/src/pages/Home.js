@@ -11,10 +11,12 @@ const Home = () => {
   const navigate = useNavigate();
 
   const analyzeSentiment = async () => {
+    if (!comment.trim()) return; // Early exit if empty
     setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/analyze', { text: comment });
       setResult(response.data);
+      setComment(''); // Clear textarea
     } catch (error) {
       alert('Error analyzing sentiment!');
     } finally {
@@ -22,7 +24,6 @@ const Home = () => {
     }
   };
 
-  // Updated sentiment color mapping
   const getSentimentColor = (sentiment) => {
     const colors = {
       'Positive': 'text-green-600',
@@ -39,14 +40,14 @@ const Home = () => {
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">E-Consultation Sentiment Analyzer</h1>
         <textarea
-          className="w-full h-32 p-4 border border-gray-300 rounded-lg mb-4"
+          className="w-full h-32 p-4 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Paste or type comments here..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
         <button
           onClick={analyzeSentiment}
-          disabled={isLoading}
+          disabled={isLoading || !comment.trim()}
           className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
         >
           <FiSend /> {isLoading ? 'Analyzing...' : 'Analyze Sentiment'}
@@ -83,6 +84,11 @@ const Home = () => {
           </div>
         )}
       </div>
+      <div className="mt-10 max-w-3xl mx-auto">
+        <WordCloud />
+      </div>
     </div>
   );
 };
+
+export default Home;
